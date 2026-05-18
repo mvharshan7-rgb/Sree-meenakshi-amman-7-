@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store Admin Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-slate-100 min-h-screen flex items-center justify-center p-4">
+
+    <div id="dashboardPanel" class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-xl border border-gray-100">
+        <div class="flex justify-between items-center mb-6 border-b border-gray-100 pb-4">
+            <div>
+                <h2 class="text-2xl font-black text-slate-900">Upload Center</h2>
+                <p class="text-xs text-gray-500">Push new stock live to Cloud Database</p>
+            </div>
+        </div>
+
+        <form onsubmit="uploadProductToCloud(event)" class="space-y-4">
+            <div>
+                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Product Title</label>
+                <input type="text" id="prodTitle" placeholder="e.g. Pure Cotton Silk Saree" class="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" required>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Price (INR)</label>
+                    <input type="number" id="prodPrice" placeholder="e.g. 1450" class="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" required>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Image Direct Link (PostImages)</label>
+                    <input type="text" id="prodImage" placeholder="https://i.postimg.cc/..." class="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" required>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Description (Optional)</label>
+                <textarea id="prodDesc" rows="3" placeholder="Describe fabric quality, borders, patterns..." class="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"></textarea>
+            </div>
+
+            <button type="submit" id="submitBtn" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-black py-4 rounded-xl transition shadow-xl mt-4 cursor-pointer flex items-center justify-center gap-2">
+                Publish Product to Database
+            </button>
+        </form>
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://mzwkuhtwzsuzwxuiujkk.supabase.co"; 
+        const SUPABASE_KEY = "sb_publishable_4GyLDREsM422Jl0sQYyxcQ_ykwCVYFz";
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function uploadProductToCloud(event) {
+            if(event) event.preventDefault(); // Complete blocker for unexpected web form reloads
+
+            const title = document.getElementById('prodTitle').value.trim();
+            const price = document.getElementById('prodPrice').value.trim();
+            const image = document.getElementById('prodImage').value.trim();
+            const description = document.getElementById('prodDesc').value.trim();
+            const submitBtn = document.getElementById('submitBtn');
+
+            try {
+                submitBtn.disabled = true;
+                submitBtn.innerText = "Uploading... Please wait...";
+
+                const { data, error } = await supabase
+                    .from('products')
+                    .insert([{ title, price: parseFloat(price), image, description }]);
+
+                if (error) {
+                    alert("🔴 Cloud Upload Failed: " + error.message);
+                } else {
+                    alert("🎉 Product successfully published live on Cloud Database!");
+                    // Resets the inputs cleanly for the next batch entry, zero password loops!
+                    document.getElementById('prodTitle').value = '';
+                    document.getElementById('prodPrice').value = '';
+                    document.getElementById('prodImage').value = '';
+                    document.getElementById('prodDesc').value = '';
+                }
+            } catch (err) {
+                alert("💥 Crash during upload: " + err.message);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Publish Product to Database";
+            }
+        }
+    </script>
+</body>
+</html>
