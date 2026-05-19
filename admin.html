@@ -1,89 +1,247 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Store Admin Dashboard</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin – Sree Meenakshi Amman Sarees</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
-<body class="bg-slate-100 min-h-screen flex items-center justify-center p-4">
+<body>
 
-    <div id="dashboardPanel" class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-xl border border-gray-100">
-        <div class="flex justify-between items-center mb-6 border-b border-gray-100 pb-4">
-            <div>
-                <h2 class="text-2xl font-black text-slate-900">Upload Center</h2>
-                <p class="text-xs text-gray-500">Push new stock live to Cloud Database</p>
-            </div>
-        </div>
-
-        <form onsubmit="uploadProductToCloud(event)" class="space-y-4">
-            <div>
-                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Product Title</label>
-                <input type="text" id="prodTitle" placeholder="e.g. Pure Cotton Silk Saree" class="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" required>
-            </div>
-            
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Price (INR)</label>
-                    <input type="number" id="prodPrice" placeholder="e.g. 1450" class="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Image Direct Link (PostImages)</label>
-                    <input type="text" id="prodImage" placeholder="https://i.postimg.cc/..." class="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500" required>
-                </div>
-            </div>
-
-            <div>
-                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Description (Optional)</label>
-                <textarea id="prodDesc" rows="3" placeholder="Describe fabric quality, borders, patterns..." class="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"></textarea>
-            </div>
-
-            <button type="submit" id="submitBtn" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-black py-4 rounded-xl transition shadow-xl mt-4 cursor-pointer flex items-center justify-center gap-2">
-                Publish Product to Database
-            </button>
-        </form>
+  <!-- ══════════════════════════════════════
+       ADMIN HEADER
+  ══════════════════════════════════════ -->
+  <div class="admin-header">
+    <a href="index.html" class="back-btn">← Back to Store</a>
+    <div>
+      <h1 class="admin-title">Admin Dashboard</h1>
+      <p class="admin-sub">Manage your product catalogue</p>
     </div>
+  </div>
 
-    <script>
-        const SUPABASE_URL = "https://mzwkuhtwzsuzwxuiujkk.supabase.co"; 
-        const SUPABASE_KEY = "sb_publishable_4GyLDREsM422Jl0sQYyxcQ_ykwCVYFz";
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  <!-- ══════════════════════════════════════
+       ADMIN BODY
+  ══════════════════════════════════════ -->
+  <div class="admin-body">
+    <div class="admin-grid">
 
-        async function uploadProductToCloud(event) {
-            if(event) event.preventDefault(); // Complete blocker for unexpected web form reloads
+      <!-- ADD PRODUCT FORM -->
+      <div class="admin-card">
+        <h2 class="admin-section-title">Add New Product</h2>
+        <div class="admin-form">
 
-            const title = document.getElementById('prodTitle').value.trim();
-            const price = document.getElementById('prodPrice').value.trim();
-            const image = document.getElementById('prodImage').value.trim();
-            const description = document.getElementById('prodDesc').value.trim();
-            const submitBtn = document.getElementById('submitBtn');
+          <div class="form-group">
+            <label class="form-label" for="fTitle">Product Title *</label>
+            <input id="fTitle" class="form-input" type="text"
+                   placeholder="e.g. Kanjivaram Silk Saree" />
+          </div>
 
-            try {
-                submitBtn.disabled = true;
-                submitBtn.innerText = "Uploading... Please wait...";
+          <div class="form-group">
+            <label class="form-label" for="fPrice">Price (₹) *</label>
+            <input id="fPrice" class="form-input" type="number"
+                   placeholder="e.g. 4500" min="0" />
+          </div>
 
-                const { data, error } = await supabase
-                    .from('products')
-                    .insert([{ title, price: parseFloat(price), image, description }]);
+          <div class="form-group">
+            <label class="form-label" for="fImage">Image URL *</label>
+            <input id="fImage" class="form-input" type="url"
+                   placeholder="https://…" />
+          </div>
 
-                if (error) {
-                    alert("🔴 Cloud Upload Failed: " + error.message);
-                } else {
-                    alert("🎉 Product successfully published live on Cloud Database!");
-                    // Resets the inputs cleanly for the next batch entry, zero password loops!
-                    document.getElementById('prodTitle').value = '';
-                    document.getElementById('prodPrice').value = '';
-                    document.getElementById('prodImage').value = '';
-                    document.getElementById('prodDesc').value = '';
-                }
-            } catch (err) {
-                alert("💥 Crash during upload: " + err.message);
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerText = "Publish Product to Database";
-            }
-        }
-    </script>
+          <div class="form-group">
+            <label class="form-label" for="fDesc">Description</label>
+            <textarea id="fDesc" class="form-input form-textarea"
+                      placeholder="Describe the saree…"></textarea>
+          </div>
+
+          <button class="admin-add-btn" id="addBtn" onclick="addProduct()">
+            + Add Product
+          </button>
+        </div>
+      </div>
+
+      <!-- PRODUCT LIST -->
+      <div class="admin-card">
+        <h2 class="admin-section-title">
+          Current Products
+          <span id="countBadge" style="font-size:.85rem;color:var(--text-soft);margin-left:.5rem;">(loading…)</span>
+        </h2>
+
+        <div id="productListWrap">
+          <p class="admin-loading" id="listLoading">Loading products…</p>
+          <div class="admin-product-list" id="productList" style="display:none;"></div>
+          <p class="admin-empty" id="listEmpty" style="display:none;">
+            No products yet. Add your first saree!
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toastEl" class="toast" style="display:none;"></div>
+
+  <!-- ══════════════════════════════════════
+       JAVASCRIPT
+  ══════════════════════════════════════ -->
+  <script>
+    /* ── Supabase config ── */
+    const SB_URL = 'https://mzwkuhtwzsuzwxuiujkk.supabase.co';
+    const SB_KEY = 'sb_publishable_4GYLDREsM422Jl0sQYyxcQ_ykwCVYFz';
+
+    const sbHeaders = {
+      'apikey': SB_KEY,
+      'Authorization': 'Bearer ' + SB_KEY,
+      'Content-Type': 'application/json'
+    };
+
+    /* ── State ── */
+    let products = [];
+
+    /* ── Toast helper ── */
+    let toastTimer;
+    function showToast(msg, type = 'success') {
+      const el = document.getElementById('toastEl');
+      el.textContent = msg;
+      el.className = 'toast toast-' + type;
+      el.style.display = 'block';
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => { el.style.display = 'none'; }, 3600);
+    }
+
+    /* ── Fetch products ── */
+    async function loadProducts() {
+      document.getElementById('listLoading').style.display = 'block';
+      document.getElementById('productList').style.display = 'none';
+      document.getElementById('listEmpty').style.display = 'none';
+      try {
+        const res = await fetch(
+          `${SB_URL}/rest/v1/products?select=*&order=id.desc`,
+          { headers: sbHeaders }
+        );
+        const data = await res.json();
+        products = Array.isArray(data) ? data : [];
+      } catch (e) {
+        products = [];
+        showToast('Failed to load products.', 'error');
+      }
+      renderList();
+    }
+
+    /* ── Render list ── */
+    function renderList() {
+      document.getElementById('listLoading').style.display = 'none';
+      document.getElementById('countBadge').textContent = `(${products.length})`;
+
+      const list  = document.getElementById('productList');
+      const empty = document.getElementById('listEmpty');
+
+      if (!products.length) {
+        list.style.display  = 'none';
+        empty.style.display = 'block';
+        return;
+      }
+
+      list.style.display  = 'flex';
+      empty.style.display = 'none';
+      list.innerHTML = '';
+
+      products.forEach(p => {
+        const price = Number(p.price).toLocaleString('en-IN');
+        const row = document.createElement('div');
+        row.className = 'admin-product-row';
+        row.innerHTML = `
+          <img src="${escHtml(p.image_url)}" alt="${escHtml(p.title)}"
+               class="admin-thumb"
+               onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'56\\' height=\\'56\\'%3E%3Crect width=\\'56\\' height=\\'56\\' fill=\\'%23ece8e0\\'/%3E%3C/svg%3E'" />
+          <div class="admin-row-info">
+            <p class="admin-row-title" title="${escHtml(p.title)}">${escHtml(p.title)}</p>
+            <p class="admin-row-price">₹${price}</p>
+          </div>
+          <button class="delete-btn" onclick="deleteProduct(${p.id})">Delete</button>`;
+        list.appendChild(row);
+      });
+    }
+
+    /* ── Add product ── */
+    async function addProduct() {
+      const title  = document.getElementById('fTitle').value.trim();
+      const price  = document.getElementById('fPrice').value.trim();
+      const image  = document.getElementById('fImage').value.trim();
+      const desc   = document.getElementById('fDesc').value.trim();
+
+      if (!title || !price || !image) {
+        showToast('Please fill Title, Price, and Image URL.', 'error');
+        return;
+      }
+      if (isNaN(parseFloat(price)) || parseFloat(price) < 0) {
+        showToast('Please enter a valid price.', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('addBtn');
+      btn.disabled = true;
+      btn.textContent = 'Adding…';
+
+      try {
+        const res = await fetch(`${SB_URL}/rest/v1/products`, {
+          method: 'POST',
+          headers: { ...sbHeaders, 'Prefer': 'return=representation' },
+          body: JSON.stringify({
+            title,
+            price: parseFloat(price),
+            image_url: image,
+            description: desc || null
+          })
+        });
+        if (!res.ok) throw new Error();
+        showToast('Product added successfully! ✨');
+        document.getElementById('fTitle').value = '';
+        document.getElementById('fPrice').value = '';
+        document.getElementById('fImage').value = '';
+        document.getElementById('fDesc').value  = '';
+        await loadProducts();
+      } catch (e) {
+        showToast('Error adding product. Please try again.', 'error');
+      }
+
+      btn.disabled = false;
+      btn.textContent = '+ Add Product';
+    }
+
+    /* ── Delete product ── */
+    async function deleteProduct(id) {
+      if (!confirm('Remove this product from the catalogue?')) return;
+      try {
+        const res = await fetch(
+          `${SB_URL}/rest/v1/products?id=eq.${id}`,
+          { method: 'DELETE', headers: sbHeaders }
+        );
+        if (!res.ok) throw new Error();
+        showToast('Product removed.');
+        await loadProducts();
+      } catch (e) {
+        showToast('Error deleting product.', 'error');
+      }
+    }
+
+    /* ── Allow Enter key in form fields ── */
+    ['fTitle','fPrice','fImage','fDesc'].forEach(id => {
+      document.getElementById(id).addEventListener('keydown', e => {
+        if (e.key === 'Enter' && id !== 'fDesc') addProduct();
+      });
+    });
+
+    /* ── Util ── */
+    function escHtml(s) {
+      return String(s)
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    /* ── Boot ── */
+    loadProducts();
+  </script>
 </body>
 </html>
